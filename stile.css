@@ -1,0 +1,27 @@
+:root { --sfondo: #07070f; --carta: #101025; --testo: #eceeff; --tenue: #a9adcf; --ciano: #00e5ff; --viola: #7c5cff; --magenta: #ff3dcb; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 16px/1.65 "Segoe UI", system-ui, -apple-system, sans-serif; color: var(--testo);
+       background: radial-gradient(ellipse at 50% -10%, #1b1546 0%, var(--sfondo) 60%) fixed, var(--sfondo); }
+main { max-width: 720px; margin: 0 auto; padding: 40px 16px 56px; }
+a { color: var(--ciano); text-underline-offset: 3px; }
+h1, h2 { font-family: Bahnschrift, "Segoe UI", system-ui, sans-serif; letter-spacing: .02em; line-height: 1.2; }
+h1 { font-size: 2rem; margin: 0 0 6px; }
+h2 { font-size: 1.15rem; margin: 32px 0 8px; color: #fff; }
+.testata { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+.testata img { width: 72px; height: 72px; border-radius: 50%; box-shadow: 0 0 24px rgba(124, 92, 255, .45); }
+.sottotitolo { color: var(--tenue); margin: 0; }
+.riga { height: 3px; width: 160px; border-radius: 2px; background: linear-gradient(90deg, var(--ciano), var(--viola), var(--magenta)); margin: 10px 0 24px; }
+.scheda { background: var(--carta); border: 1px solid #23234a; border-radius: 14px; padding: 18px 20px; margin: 16px 0; }
+.canali { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 12px 0; }
+.canali a { display: block; text-align: center; padding: 12px; border-radius: 12px; text-decoration: none; color: #fff; font-weight: 600;
+            background: var(--carta); border: 1px solid #2b2b58; }
+.canali a:hover, .canali a:focus-visible { border-color: var(--viola); box-shadow: 0 0 16px rgba(124, 92, 255, .35); }
+ul { padding-left: 20px; }
+footer { margin-top: 40px; color: var(--tenue); font-size: .9rem; border-top: 1px solid #23234a; padding-top: 16px; }
+small, .tenue { color: var(--tenue); }
+h1, p, li { overflow-wrap: anywhere; }
+@media (max-width: 480px) {
+  h1 { font-size: 1.45rem; }
+  .testata img { width: 56px; height: 56px; }
+  .canali { grid-template-columns: 1fr 1fr; }
+}
