@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>THECHEMIST'S BRAIN: il tuo agente privato sul PC · THECHEMIST EMPIRE</title>
-<meta name="description" content="La dashboard personale che tiene in ordine cose da fare, progetti, contenuti, note, abbonamenti e sicurezza, sul tuo PC.">
+<meta name="description" content="La dashboard personale che tiene in ordine cose da fare, progetti, contenuti, note, abbonamenti e sicurezza, sul tuo PC. Com'è fatta e la base da provare in 5 minuti.">
 <link rel="icon" href="../logo.png">
 <link rel="stylesheet" href="../stile.css">
 </head>
@@ -25,38 +25,237 @@
     <li><b>Gestione:</b> abbonamenti, posta, sicurezza del PC.</li>
   </ul>
 
+  <h2>Com'è fatta</h2>
+  <p>Tre pezzi e nient'altro: un server in Python che usa solo la libreria standard, una pagina sola, un file di dati. Niente cloud e niente account: risponde solo dal tuo PC.</p>
+  <figure><img class="foto" src="brain/01-sala-di-controllo.jpg" alt="La sala di controllo della dashboard al primo avvio, con le sei aree" width="1254" height="595" loading="lazy"><figcaption>La sala di controllo al primo avvio: sei aree, con i numeri ancora a zero.</figcaption></figure>
+
+  <h2>Prova la base in 5 minuti</h2>
+  <p>La dashboard intera è grande, ma l'idea sta in tre file. Ti serve solo Python 3 (da <a href="https://www.python.org/downloads/">python.org</a>): nessuna libreria da installare.</p>
+  <ol>
+    <li>Crea una cartella <code>brain</code> e salvaci dentro i tre file qui sotto.</li>
+    <li>Apri PowerShell in quella cartella e scrivi <code>python server.py</code>.</li>
+    <li>Apri il browser su <code>http://127.0.0.1:8777</code>: vedi le tue tre aree.</li>
+    <li>Cambia una riga di <code>dati.json</code>, salva e ricarica la pagina: è cambiata anche lì.</li>
+  </ol>
+<p><b><code>server.py</code></b></p>
+<pre><code>import json
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+
+QUI = Path(__file__).parent
+
+
+class Brain(BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == &quot;/api/dati&quot;:
+            corpo, tipo = (QUI / &quot;dati.json&quot;).read_bytes(), &quot;application/json&quot;
+        else:
+            corpo, tipo = (QUI / &quot;pagina.html&quot;).read_bytes(), &quot;text/html; charset=utf-8&quot;
+        self.send_response(200)
+        self.send_header(&quot;Content-Type&quot;, tipo)
+        self.end_headers()
+        self.wfile.write(corpo)
+
+
+print(&quot;Apri http://127.0.0.1:8777&quot;)
+ThreadingHTTPServer((&quot;127.0.0.1&quot;, 8777), Brain).serve_forever()</code></pre>
+<p><b><code>pagina.html</code></b></p>
+<pre><code>&lt;!doctype html&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;title&gt;Il mio Brain&lt;/title&gt;
+&lt;style&gt;
+  body { font-family: system-ui; background: #10131a; color: #e8eaf0; margin: 40px; }
+  #aree { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .area { background: #1a1f2b; border-radius: 12px; padding: 16px; }
+&lt;/style&gt;
+&lt;h1&gt;Il mio Brain&lt;/h1&gt;
+&lt;div id=&quot;aree&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+  fetch(&quot;/api/dati&quot;).then(r =&gt; r.json()).then(d =&gt; {
+    for (const a of d.aree) {
+      const box = document.createElement(&quot;div&quot;);
+      box.className = &quot;area&quot;;
+      box.innerHTML = &quot;&lt;h2&gt;&lt;/h2&gt;&lt;ul&gt;&lt;/ul&gt;&quot;;
+      box.querySelector(&quot;h2&quot;).textContent = a.nome;
+      for (const c of a.cose) box.querySelector(&quot;ul&quot;).appendChild(document.createElement(&quot;li&quot;)).textContent = c;
+      document.getElementById(&quot;aree&quot;).appendChild(box);
+    }
+  });
+&lt;/script&gt;</code></pre>
+<p><b><code>dati.json</code></b></p>
+<pre><code>{
+  &quot;aree&quot;: [
+    {
+      &quot;nome&quot;: &quot;Oggi&quot;,
+      &quot;cose&quot;: [
+        &quot;Rispondere a Marta&quot;,
+        &quot;Pagare la bolletta entro venerdì&quot;
+      ]
+    },
+    {
+      &quot;nome&quot;: &quot;Progetti&quot;,
+      &quot;cose&quot;: [
+        &quot;Sito nuovo: a metà&quot;,
+        &quot;Corso di inglese: lezione 4&quot;
+      ]
+    },
+    {
+      &quot;nome&quot;: &quot;Abbonamenti&quot;,
+      &quot;cose&quot;: [
+        &quot;Musica: 10,99 € il 15&quot;,
+        &quot;Spazio cloud: 1,99 € il 28&quot;
+      ]
+    }
+  ]
+}</code></pre>
+  <p><b>Hai finito quando:</b> la pagina mostra le aree che hai scritto tu in <code>dati.json</code>.</p>
+  <p class="tenue">Il server risponde solo a <code>127.0.0.1</code>, cioè al tuo PC: dalla rete non lo vede nessuno.</p>
+
+  <h2>Da qui alla dashboard completa</h2>
+  <p>Il resto è lo stesso schema, cresciuto: ogni area ha le sue sezioni e il server sa fare molte più cose.</p>
+  <ul>
+    <li>esegue i tuoi comandi con un clic e li tiene divisi per area;</li>
+    <li>ti avvisa prima che un abbonamento si rinnovi;</li>
+    <li>cerca in un colpo solo tra comandi, progetti, note e mail;</li>
+    <li>usa l'IA che gira sul PC con Ollama, anche per posta e conti;</li>
+    <li>si apre dal telefono come un'app, con il PIN per le azioni delicate;</li>
+    <li>scrive ogni modifica in un registro, con data e ora.</li>
+  </ul>
+  <figure><img class="foto" src="brain/02-comandi.jpg" alt="La sezione Comandi con i comandi di esempio divisi per area" width="1254" height="595" loading="lazy"><figcaption>I comandi, divisi per area.</figcaption></figure>
+  <figure><img class="foto" src="brain/03-abbonamenti.jpg" alt="La sezione Abbonamenti con il calendario dei rinnovi" width="1254" height="595" loading="lazy"><figcaption>Gli abbonamenti, con il calendario dei rinnovi.</figcaption></figure>
+
   <div class="scheda">
     <b>Cosa ricevi con 11 $ al mese</b>
     <ul style="margin:8px 0 0">
       <li>il codice della dashboard, ripulito e pronto da avviare;</li>
-      <li>la guida passo passo, in italiano e in inglese;</li>
+      <li>la guida passo passo, con le schermate, in italiano e in inglese;</li>
       <li>tutto il corso sulle guide IA.</li>
     </ul>
     <p class="tenue" style="margin:10px 0 0">L'abbonamento apre a breve: appena è attivo, il link compare qui.</p>
   </div>
-  <p class="tenue">Nel video i numeri e i nomi sono di esempio.</p>
+  <p class="tenue">Nel video e nelle schermate i numeri e i nomi sono di esempio.</p>
 
   <h2 id="english" lang="en">THECHEMIST'S BRAIN: your private agent on your own PC</h2>
   <div lang="en">
-    <p>The dashboard that keeps everything you do on your computer in one place. It runs on your PC and uses the AI you installed there: your data stays home.</p>
-    <ul>
-      <li><b>Today:</b> what's on, emails to answer, deadlines, money spent.</li>
-      <li><b>Work:</b> projects with their progress and AI agents at work.</li>
-      <li><b>Creator:</b> social content, prepared and published in two languages.</li>
-      <li><b>AI:</b> the models on your PC and the assistant that answers from your data.</li>
-      <li><b>Knowledge:</b> notes, project maps, search in a second.</li>
-      <li><b>Admin:</b> subscriptions, mail, PC security.</li>
+  <p>The dashboard that keeps everything you do on your computer in one place. It runs on your PC and uses the AI you installed there: your data stays home.</p>
+  <ul>
+    <li><b>Today:</b> what's on, emails to answer, deadlines, money spent.</li>
+    <li><b>Work:</b> projects with their progress and AI agents at work.</li>
+    <li><b>Creator:</b> social content, prepared and published in two languages.</li>
+    <li><b>AI:</b> the models on your PC and the assistant that answers from your data.</li>
+    <li><b>Knowledge:</b> notes, project maps, search in a second.</li>
+    <li><b>Admin:</b> subscriptions, mail, PC security.</li>
+  </ul>
+
+  <h2>How it's built</h2>
+  <p>Three pieces and nothing else: a Python server that uses only the standard library, a single page, one data file. No cloud and no account: it answers only from your PC.</p>
+  <figure><img class="foto" src="brain/01-sala-di-controllo.jpg" alt="The dashboard control room on first start, with the six areas" width="1254" height="595" loading="lazy"><figcaption>The control room on first start: six areas, numbers still at zero. The interface is in Italian.</figcaption></figure>
+
+  <h2>Try the base in 5 minutes</h2>
+  <p>The full dashboard is big, but the idea fits in three files. You only need Python 3 (from <a href="https://www.python.org/downloads/">python.org</a>): no libraries to install.</p>
+  <ol>
+    <li>Create a <code>brain</code> folder and save the three files below in it.</li>
+    <li>Open PowerShell in that folder and type <code>python server.py</code>.</li>
+    <li>Open your browser at <code>http://127.0.0.1:8777</code>: you see your three areas.</li>
+    <li>Change a line in <code>dati.json</code>, save and reload the page: it changed there too.</li>
+  </ol>
+<p><b><code>server.py</code></b></p>
+<pre><code>import json
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+
+QUI = Path(__file__).parent
+
+
+class Brain(BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == &quot;/api/dati&quot;:
+            corpo, tipo = (QUI / &quot;dati.json&quot;).read_bytes(), &quot;application/json&quot;
+        else:
+            corpo, tipo = (QUI / &quot;pagina.html&quot;).read_bytes(), &quot;text/html; charset=utf-8&quot;
+        self.send_response(200)
+        self.send_header(&quot;Content-Type&quot;, tipo)
+        self.end_headers()
+        self.wfile.write(corpo)
+
+
+print(&quot;Apri http://127.0.0.1:8777&quot;)
+ThreadingHTTPServer((&quot;127.0.0.1&quot;, 8777), Brain).serve_forever()</code></pre>
+<p><b><code>pagina.html</code></b></p>
+<pre><code>&lt;!doctype html&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;title&gt;My Brain&lt;/title&gt;
+&lt;style&gt;
+  body { font-family: system-ui; background: #10131a; color: #e8eaf0; margin: 40px; }
+  #aree { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .area { background: #1a1f2b; border-radius: 12px; padding: 16px; }
+&lt;/style&gt;
+&lt;h1&gt;My Brain&lt;/h1&gt;
+&lt;div id=&quot;aree&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+  fetch(&quot;/api/dati&quot;).then(r =&gt; r.json()).then(d =&gt; {
+    for (const a of d.aree) {
+      const box = document.createElement(&quot;div&quot;);
+      box.className = &quot;area&quot;;
+      box.innerHTML = &quot;&lt;h2&gt;&lt;/h2&gt;&lt;ul&gt;&lt;/ul&gt;&quot;;
+      box.querySelector(&quot;h2&quot;).textContent = a.nome;
+      for (const c of a.cose) box.querySelector(&quot;ul&quot;).appendChild(document.createElement(&quot;li&quot;)).textContent = c;
+      document.getElementById(&quot;aree&quot;).appendChild(box);
+    }
+  });
+&lt;/script&gt;</code></pre>
+<p><b><code>dati.json</code></b></p>
+<pre><code>{
+  &quot;aree&quot;: [
+    {
+      &quot;nome&quot;: &quot;Today&quot;,
+      &quot;cose&quot;: [
+        &quot;Reply to Marta&quot;,
+        &quot;Pay the bill by Friday&quot;
+      ]
+    },
+    {
+      &quot;nome&quot;: &quot;Projects&quot;,
+      &quot;cose&quot;: [
+        &quot;New website: halfway&quot;,
+        &quot;English course: lesson 4&quot;
+      ]
+    },
+    {
+      &quot;nome&quot;: &quot;Subscriptions&quot;,
+      &quot;cose&quot;: [
+        &quot;Music: $10.99 on the 15th&quot;,
+        &quot;Cloud storage: $1.99 on the 28th&quot;
+      ]
+    }
+  ]
+}</code></pre>
+  <p><b>You're done when:</b> the page shows the areas you wrote yourself in <code>dati.json</code>.</p>
+  <p class="tenue">The server answers only at <code>127.0.0.1</code>, that is your own PC: nobody on the network can see it.</p>
+
+  <h2>From here to the full dashboard</h2>
+  <p>The rest is the same pattern, grown up: each area has its sections and the server does a lot more.</p>
+  <ul>
+    <li>runs your commands with one click and keeps them grouped by area;</li>
+    <li>warns you before a subscription renews;</li>
+    <li>searches commands, projects, notes and mail in one go;</li>
+    <li>uses the AI running on your PC with Ollama, also for mail and accounts;</li>
+    <li>opens on your phone like an app, with a PIN for sensitive actions;</li>
+    <li>writes every change to a log, with date and time.</li>
+  </ul>
+  <figure><img class="foto" src="brain/02-comandi.jpg" alt="The Commands section with sample commands grouped by area" width="1254" height="595" loading="lazy"><figcaption>Commands, grouped by area.</figcaption></figure>
+  <figure><img class="foto" src="brain/03-abbonamenti.jpg" alt="The Subscriptions section with the renewals calendar" width="1254" height="595" loading="lazy"><figcaption>Subscriptions, with the renewals calendar.</figcaption></figure>
+
+  <div class="scheda">
+    <b>What you get for $11 a month</b>
+    <ul style="margin:8px 0 0">
+      <li>the dashboard code, cleaned and ready to run;</li>
+      <li>the step-by-step guide, with screenshots, in Italian and English;</li>
+      <li>the whole AI guides course.</li>
     </ul>
-    <div class="scheda">
-      <b>What you get for $11 a month</b>
-      <ul style="margin:8px 0 0">
-        <li>the dashboard code, cleaned and ready to run;</li>
-        <li>the step-by-step guide, in Italian and English;</li>
-        <li>the whole AI guides course.</li>
-      </ul>
-      <p class="tenue" style="margin:10px 0 0">The subscription opens soon: as soon as it's live, the link appears here.</p>
-    </div>
-    <p class="tenue">Numbers and names in the video are sample data.</p>
+    <p class="tenue" style="margin:10px 0 0">The subscription opens soon: as soon as it's live, the link appears here.</p>
+  </div>
+  <p class="tenue">Numbers and names in the video and in the screenshots are sample data.</p>
   </div>
 
   <footer>
