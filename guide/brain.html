@@ -48,9 +48,10 @@ QUI = Path(__file__).parent
 class Brain(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == &quot;/api/dati&quot;:
-            corpo, tipo = (QUI / &quot;dati.json&quot;).read_bytes(), &quot;application/json&quot;
+            file, tipo = &quot;dati.json&quot;, &quot;application/json&quot;
         else:
-            corpo, tipo = (QUI / &quot;pagina.html&quot;).read_bytes(), &quot;text/html; charset=utf-8&quot;
+            file, tipo = &quot;pagina.html&quot;, &quot;text/html; charset=utf-8&quot;
+        corpo = (QUI / file).read_bytes()
         self.send_response(200)
         self.send_header(&quot;Content-Type&quot;, tipo)
         self.end_headers()
@@ -170,9 +171,10 @@ QUI = Path(__file__).parent
 class Brain(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == &quot;/api/dati&quot;:
-            corpo, tipo = (QUI / &quot;dati.json&quot;).read_bytes(), &quot;application/json&quot;
+            file, tipo = &quot;dati.json&quot;, &quot;application/json&quot;
         else:
-            corpo, tipo = (QUI / &quot;pagina.html&quot;).read_bytes(), &quot;text/html; charset=utf-8&quot;
+            file, tipo = &quot;pagina.html&quot;, &quot;text/html; charset=utf-8&quot;
+        corpo = (QUI / file).read_bytes()
         self.send_response(200)
         self.send_header(&quot;Content-Type&quot;, tipo)
         self.end_headers()
