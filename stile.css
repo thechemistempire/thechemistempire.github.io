@@ -16,6 +16,16 @@ h2 { font-size: 1.15rem; margin: 32px 0 8px; color: #fff; }
 .canali a { display: block; text-align: center; padding: 12px; border-radius: 12px; text-decoration: none; color: #fff; font-weight: 600;
             background: var(--carta); border: 1px solid #2b2b58; }
 .canali a:hover, .canali a:focus-visible { border-color: var(--viola); box-shadow: 0 0 16px rgba(124, 92, 255, .35); }
+.indice { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; }
+.indice a { padding: 6px 14px; border-radius: 999px; border: 1px solid #2b2b58; color: var(--testo); text-decoration: none; font-size: .92rem; }
+.indice a:hover, .indice a:focus-visible { border-color: var(--viola); }
+.guida { background: var(--carta); border: 1px solid #23234a; border-radius: 14px; padding: 16px 20px; margin: 12px 0; }
+.guida h3 { margin: 0 0 4px; font: 600 1.05rem Bahnschrift, "Segoe UI", system-ui, sans-serif; color: #fff; }
+.guida p { margin: 0 0 12px; color: var(--tenue); }
+.azioni { display: flex; flex-wrap: wrap; gap: 10px; }
+.azioni a { padding: 8px 16px; border-radius: 10px; border: 1px solid #2b2b58; color: #fff; text-decoration: none; font-weight: 600; font-size: .95rem; }
+.azioni a.pieno { background: var(--viola); border-color: var(--viola); }
+.azioni a:hover, .azioni a:focus-visible { border-color: var(--ciano); }
 ul, ol { padding-left: 20px; }
 pre { background: #0b0b1c; border: 1px solid #23234a; border-radius: 10px; padding: 12px 14px; margin: 8px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 code { font: 14px/1.5 "Cascadia Mono", Consolas, monospace; color: #dfe3ff; }
